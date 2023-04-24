@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATE=$(date +"%Y-%m-%dT%H:%M%:%SZ")
+DATE=$(date +"%Y-%m-%dT%H:%M:%S")
 echo "Run ${DATE}"
 GRPC_SERVER="localhost:8083"
 # GRPC_SERVER=$(sudo lsof -i -n -P | grep carto | awk '{ print $9 }' | head -n 1)
