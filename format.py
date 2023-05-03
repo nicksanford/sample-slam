@@ -14,8 +14,8 @@ class Sample:
     timestamp: datetime.datetime
     content: bytes
 
-output_sub_dirs = ['position', 'position_new', 'image_map', 'pointcloud', 'internal_state']
-input_sub_dirs = ['position', 'position_new', 'image', 'map', 'internal_state']
+output_sub_dirs = ['position', 'pointcloud', 'internal_state']
+input_sub_dirs = ['position', 'map', 'internal_state']
 
 def compute_to_migrate(input_directory):
     to_migrate = {d: [] for d in input_sub_dirs}
@@ -40,30 +40,22 @@ def dedupe(to_migrate):
     to_migrate['map'] = [map for _, map in content_to_map.items()]
 
     new_to_migrate = {d: [] for d in input_sub_dirs}
-    for position in to_migrate['position']:
-        position_new = find(to_migrate['position_new'], position)            
-        image = find(to_migrate['image'], position)            
+    for position in to_migrate['position']:   
         map = find(to_migrate['map'], position)            
         internal_state = find(to_migrate['internal_state'], position)            
-        if position_new and image and map and internal_state:
-            new_to_migrate['position_new'].append(position_new)
+        if map and internal_state:
             new_to_migrate['position'].append(position)
-            new_to_migrate['image'].append(image)
             new_to_migrate['map'].append(map)
             new_to_migrate['internal_state'].append(internal_state)
 
     return new_to_migrate
 
 def save(output_directory, to_migrate):
-    for i, position in enumerate(to_migrate['position']):
-        position_new = find(to_migrate['position_new'], position)
-        image = find(to_migrate['image'], position)            
+    for i, position in enumerate(to_migrate['position']): 
         map = find(to_migrate['map'], position)            
         internal_state = find(to_migrate['internal_state'], position)            
-        if position_new and image and map and internal_state:
-            write(output_directory, 'position_new', f"position_{i}.{position_new.ext}", position_new.content)
+        if map and internal_state:
             write(output_directory, 'position', f"position_{i}.{position.ext}", position.content)
-            write(output_directory, 'image_map', f"image_map_{i}.{image.ext}", image.content)
             write(output_directory, 'pointcloud', f"pointcloud_{i}.{map.ext}", map.content)
             write(output_directory, 'internal_state', f"internal_state_{i}.{internal_state.ext}", internal_state.content)
 
